@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: csk1234/incops-frontend:latest   # ✅ corrected to your DockerHub ID
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        env:
+        - name: API_URL
+          value: "http://backend-service:5000"  # ✅ points to backend service inside cluster
+        livenessProbe:                          # ✅ added probes
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
